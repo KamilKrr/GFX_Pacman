@@ -12,6 +12,10 @@ class Scene {
     this.camera = camera;
   }
 
+  setMap(map) {
+    this.map = map;
+  }
+
   setLight(light) {
     this.light = light;
   }
@@ -39,6 +43,10 @@ class Scene {
     this.gl.uniform4fv(currentShaderProgram.uniforms.lightPosition, this.light.getTranslation(this.camera));
 
     this.shapes.forEach(shape => {
+      shape.draw(this.camera);
+    });
+
+    this.map.objects.forEach(shape => {
       shape.draw(this.camera);
     });
 

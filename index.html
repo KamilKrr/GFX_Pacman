@@ -26,92 +26,8 @@
     <script type="text/javascript" src="main.js"></script>
     <script type="text/javascript" src="helpers.js"></script>
 
-    <script id="v-gouraud-diffuse" type="x-shader/x-vertex">
-        precision mediump float;
 
-        attribute vec4 vertexPosition;
-        attribute vec4 vertexColor;
-        attribute vec3 vertexNormal;
-
-        uniform mat4 modelViewMatrix;
-        uniform mat4 projectionMatrix;
-        uniform mat3 normalMatrix;
-
-        uniform vec4 lightViewPosition;
-
-        uniform float Kd;   // Diffuse reflection coefficient
-
-        varying vec4 fragmentColor;
-
-        void main() {
-            vec4 vertexViewPosition = modelViewMatrix * vertexPosition;
-            vec3 lightVector = normalize(lightViewPosition.xyz - vertexViewPosition.xyz);
-            vec3 normal = normalize(normalMatrix * vertexNormal);
-
-            float lightIntensity = max(0.0, dot(lightVector, normal));
-
-
-            gl_Position = projectionMatrix * vertexViewPosition;
-            fragmentColor = Kd * vertexColor * lightIntensity;
-            fragmentColor.a = 1.0;
-        }
-    </script>
-
-    <script id="v-gouraud-specular" type="x-shader/x-vertex">
-        attribute vec4 vertexPosition;
-        attribute vec4 vertexColor;
-        attribute vec3 vertexNormal;
-
-        uniform mat4 modelViewMatrix;
-        uniform mat4 projectionMatrix;
-        uniform mat3 normalMatrix;
-
-        uniform float Ka;   // Ambient reflection coefficient
-        uniform float Kd;   // Diffuse reflection coefficient
-        uniform float Ks;   // Specular reflection coefficient
-        uniform float shininessVal; // Shininess
-
-        uniform vec3 ambientColor;
-        uniform vec3 specularColor;
-
-        uniform vec4 lightViewPosition;  // Position of the light source
-        uniform vec4 cameraPosition; // Position of the camera
-
-        varying vec4 fragmentColor;
-
-        void main() {
-            vec4 vertexViewPosition = modelViewMatrix * vertexPosition;
-            vec3 lightVector = normalize(lightViewPosition.xyz - vertexViewPosition.xyz);
-            vec3 viewVector = normalize(cameraPosition.xyz - vertexViewPosition.xyz);
-            vec3 normal = normalize(normalMatrix * vertexNormal);
-
-
-            // Lambert's cosine law
-            float lambertian = max(dot(normal, lightVector), 0.0);
-            float specular = 0.0;
-            if(lambertian > 0.0) {
-                vec3 reflectionVector = reflect(-lightVector, normal);
-                float specAngle = max(dot(reflectionVector, viewVector), 0.0);
-                specular = pow(specAngle, shininessVal);
-            }
-            fragmentColor = vec4(Ka * ambientColor +
-                       Kd * lambertian * vertexColor.xyz +
-                       Ks * specular * specularColor, 1.0);
-
-            gl_Position = projectionMatrix * vertexViewPosition;
-        }
-    </script>
-
-
-    <script id="f-gouraud" type="x-shader/x-fragment">
-        precision mediump float;
-
-        varying vec4 fragmentColor;
-
-        void main() {
-            gl_FragColor = fragmentColor;
-        }
-    </script>
+    <script type="text/javascript" src="Game/GameMap.js"></script>
 
     <script id="v-phong" type="x-shader/x-vertex">
         attribute vec4 vertexPosition;
@@ -175,36 +91,10 @@
                        Ks * specular * specularColor, 1.0);
         }
     </script>
-
-    <script id="f-phong-diffuse" type="x-shader/x-fragment">
-        precision mediump float;
-
-        varying vec3 normal;
-        varying vec4 color;
-        varying vec4 vertexViewPosition;
-
-        uniform float Kd;   // Diffuse reflection coefficient
-
-        uniform vec4 lightViewPosition;  // Position of the light source
-        uniform vec4 cameraPosition; // Position of the camera
-
-        void main() {
-            vec4 vertexViewPosition = normalize(vertexViewPosition);
-            vec3 normal = normalize(normal);
-
-            vec3 lightVector = normalize(lightViewPosition.xyz - vertexViewPosition.xyz);
-            vec3 viewVector = normalize(cameraPosition.xyz - vertexViewPosition.xyz);
-
-            // Lambert's cosine law
-            float lambertian = max(dot(normal, lightVector), 0.0);
-
-            gl_FragColor = vec4(Kd * lambertian * color.xyz, 1.0);
-        }
-    </script>
 </head>
 
 <body>
-    <canvas id="canvas" width="1200" height="600"></canvas>
+    <canvas id="canvas"></canvas>
 </body>
 
 

@@ -38,6 +38,7 @@ class WavefrontObjImporter {
 
         //calculate normal
         //search neighboring faces and average their normals
+        /*
         let neighboringNormals = [];
         parsedData.faces.forEach(_face => {
           if(_face.vertices.includes(vertexIndex)){
@@ -59,7 +60,8 @@ class WavefrontObjImporter {
         sumNormals[2] = sumNormals[2] / length;
 
         normals.push(sumNormals);
-        //normals.push(parsedData.normals[normalIndex - 1]);
+        */
+        normals.push(parsedData.normals[normalIndex - 1]);
       }
     })
 
