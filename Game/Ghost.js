@@ -1,94 +1,19 @@
-class Pacman {
-  constructor(head, body) {
-    this.head = head;
+class Ghost {
+  constructor(body, eyes) {
     this.body = body;
+    this.eyes = eyes;
+
     this.currentDirection = 'right';
     this.nextDirection = 'right';
     this.currentRotation = 90;
-    this.mouthRotation = 45;
-    this.isOpeningMouth = true;
-
-    this.verticalPosition = 0;
-    this.gravity = 30;
-    this.jumpForce = 4;
-    this.isJumping = false;
-    this.isDoubleJump = false;
-    this.currentJumpForce = 0;
-    this.wasInAir = false;
-
-    this.collectedFood = 0;
-  }
-
-  setDirection(direction) {
-    this.nextDirection = direction;
+    this.directions = ['up', 'right', 'left', 'down'];
   }
 
   update(delta, gameMap, camera) {
-    if(this.verticalPosition <= 0.05) {
-      if(this.wasInAir) {
-        this.isJumping = false;
-        this.isDoubleJump = false;
-        this.wasInAir = false;
-        this.currentJumpForce = 0;
-      }
-    }else{
-      this.wasInAir = true;
-      this.currentJumpForce -= this.gravity * delta;
-    }
-
     this.#move(delta, gameMap.map, camera);
     this.#orient(delta);
-    this.#animateJump(delta);
-    this.#animate(delta);
-    this.#eatFood(gameMap.foodMap);
   }
 
-  #eatFood(foodMap) {
-    if(this.#isAtCenter(0.05)) {
-      let x = Math.floor((this.xPos + 0.05) / 0.2);
-      let y = Math.floor((this.yPos + 0.05) / 0.2);
-      if(foodMap[y][x]){
-        this.collectedFood++;
-        foodMap[y][x].hide();
-      }
-    }
-  }
-
-  jump() {
-    if(this.isJumping){
-      if(this.isDoubleJump) return;
-      this.isDoubleJump = true;
-    }
-
-    this.isJumping = true;
-    this.currentJumpForce = this.jumpForce;
-  }
-
-  #animateJump(delta) {
-    if(this.isJumping) {
-      this.verticalPosition += this.currentJumpForce * delta;
-
-      this.head.translate([0, this.currentJumpForce * delta, 0], true);
-      this.body.translate([0, this.currentJumpForce * delta, 0], true);
-    }
-  }
-
-
-  #animate(delta) {
-    if(this.mouthRotation > 70) {
-      this.isOpeningMouth = false;
-    }else if(this.mouthRotation <= 5) {
-      this.isOpeningMouth = true;
-    }
-
-    let rotation = -600 * delta;
-    if(this.isOpeningMouth) {
-      rotation *= -1;
-    }
-
-    this.mouthRotation += rotation;
-    this.head.rotate(rotation * (Math.PI/180), [0, 0, 1]);
-  }
 
   #orient(delta) {
     let targetRotation = this.#getTargetRotationAngle();
@@ -120,18 +45,27 @@ class Pacman {
     }
   }
   #move(delta, map, camera) {
+    delta *= 0.8; //ghosts are slower
     let current = this.#getNextField(this.currentDirection);
     let next = this.#getNextField(this.nextDirection);
 
     if(this.#isAtCenter() || this.#isOppositeDirection(current, next)){
+
       if(!this.hasCollidedWithWall(this.xPos + next.x * delta, this.yPos + next.y * delta, map, this.nextDirection)){
         this.currentDirection = this.nextDirection;
         this.#translate(next.x * delta, next.y * delta, camera);
         return;
       }
     }
-    if(this.hasCollidedWithWall(this.xPos + current.x * delta, this.yPos + current.y * delta, map, this.currentDirection)) return;
+    if(this.hasCollidedWithWall(this.xPos + current.x * delta, this.yPos + current.y * delta, map, this.currentDirection)){
+      this.#setNewDirection();
+      return;
+    };
     this.#translate(current.x * delta, current.y * delta, camera);
+  }
+
+  #setNewDirection() {
+    this.nextDirection = this.directions[Math.floor(Math.random() * this.directions.length)];
   }
 
   #isOppositeDirection(current, next) {
@@ -190,35 +124,38 @@ class Pacman {
   }
 
   setPosition(x, y) {
-    this.head.modelMatrix = mat4.create();
     this.body.modelMatrix = mat4.create();
+    this.eyes.modelMatrix = mat4.create();
 
     this.xPos = x * 0.2;
     this.yPos = y * 0.2;
 
-    this.head.translate([this.xPos, 0.1, this.yPos]);
     this.body.translate([this.xPos, 0.1, this.yPos]);
-    camera.translate([-this.xPos, 0, -this.yPos], false);
+    this.eyes.translate([this.xPos, 0.1, this.yPos]);
   }
 
   #translate(x, y, camera) {
     this.xPos += x;
     this.yPos += y;
-    this.head.translate([x, 0, y], true);
     this.body.translate([x, 0, y], true);
-    camera.translate([-x, 0, -y], false);
+    this.eyes.translate([x, 0, y], true);
   }
 
   #rotate(angle) {
     this.currentRotation += angle;
     this.currentRotation = ((this.currentRotation % 360) + 360) % 360;
 
-    this.head.translate([-this.xPos, 0, -this.yPos], true);
     this.body.translate([-this.xPos, 0, -this.yPos], true);
-    this.head.rotate(angle * (Math.PI/180), [0, 1, 0], true);
+    this.eyes.translate([-this.xPos, 0, -this.yPos], true);
     this.body.rotate(angle * (Math.PI/180), [0, 1, 0], true);
-    this.head.translate([this.xPos, 0, this.yPos], true);
+    this.eyes.rotate(angle * (Math.PI/180), [0, 1, 0], true);
     this.body.translate([this.xPos, 0, this.yPos], true);
+    this.eyes.translate([this.xPos, 0, this.yPos], true);
+  }
+
+  hide() {
+    this.body.hide();
+    this.eyes.hide(); 
   }
 
 }

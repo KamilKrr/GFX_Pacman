@@ -1,8 +1,15 @@
 class Game {
-  constructor(map, pacman) {
+  constructor(map, pacman, food) {
     this.map = map;
     this.pacman = pacman;
+    this.food = food;
     this.then = 0;
+
+    this.ghosts = [];
+  }
+
+  addGhost(ghost) {
+    this.ghosts.push(ghost);
   }
 
   #registerEventListeners() {
@@ -25,9 +32,14 @@ class Game {
   }
 
   initGame() {
-    this.map.createMap();
+    this.map.createMap(this.food);
     let spawnPosition = this.map.getPacmanSpawnPosition();
     this.pacman.setPosition(spawnPosition[0], spawnPosition[1]);
+
+    this.ghosts.forEach(g => {
+      let spawnPosition = this.map.getPacmanSpawnPosition();
+      g.setPosition(spawnPosition[0], spawnPosition[1]);
+    });
     this.#registerEventListeners();
   }
 
@@ -40,7 +52,22 @@ class Game {
     delta *= 0.0005;
     this.then = now;
 
-    this.pacman.update(delta, this.map.map, camera);
+    this.pacman.update(delta, this.map, camera);
+
+    this.ghosts.forEach(g => {
+      g.update(delta, this.map, camera);
+    });
+
+    this.#testCollision();
+  }
+
+  #testCollision() {
+    let distance = 0.2;
+    this.ghosts.forEach(g => {
+      if(Math.abs(g.xPos - this.pacman.xPos) < distance && Math.abs(g.yPos - this.pacman.yPos) < distance) {
+        g.hide();
+      }
+    });
   }
 
   render(camera) {
@@ -48,6 +75,11 @@ class Game {
 
     this.pacman.head.draw(camera);
     this.pacman.body.draw(camera);
+
+    this.ghosts.forEach(g => {
+      g.body.draw(camera);
+      g.eyes.draw(camera);
+    })
   }
 
 }

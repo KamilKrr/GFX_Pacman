@@ -37,15 +37,16 @@ class GameMap {
 
   }
 
-  createMap() {
+  createMap(food) {
     this.#generateMap();
-    this.#buildMap();
+    this.#buildMap(food);
   }
 
   #generateMap() {
     let size = 5;
 
     this.map = Array.from(Array(size*5), () => new Array(size*5));
+    this.foodMap = Array.from(Array(size*5), () => new Array(size*5));
 
     for (let y = 0; y < size; y++) {
       for (let x = 0; x < size; x++) {
@@ -68,7 +69,7 @@ class GameMap {
   }
 
 
-  #buildMap() {
+  #buildMap(food) {
     this.objects = [];
     let i = 0;
     for(let y = 0; y < this.map.length; y++) {
@@ -77,7 +78,12 @@ class GameMap {
           let tile = this.floors[0].copy();
           tile.translate([x * 0.2, 0, y * 0.2]);
 
+          let foodCopy = food.copy();
+          foodCopy.translate([x * 0.2, 0, y * 0.2]);
+          this.foodMap[y][x] = foodCopy;
+
           this.objects.push(tile);
+          this.objects.push(foodCopy);
         } else {
           let tile = this.walls[(x + y) % 2].copy();
           tile.translate([x * 0.2, 0, y * 0.2]);
@@ -91,8 +97,8 @@ class GameMap {
   getPacmanSpawnPosition() {
     let x, y;
     do {
-      x = Math.floor(Math.random() * this.map.length);
-      y = Math.floor(Math.random() * this.map.length);
+      x = Math.floor(Math.random() * (this.map.length - 1));
+      y = Math.floor(Math.random() * (this.map.length - 1));
     }while(this.map[y][x] !== 0)
 
     return [x, y];

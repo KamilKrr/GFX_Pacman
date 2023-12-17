@@ -97,9 +97,30 @@ async function loadObjFiles() {
     pacmanBody.scale([.1, .1, .1]);
     pacmanBody.translate([0, 0.1, 0]);
 
-    let pacman = new Pacman(pacmanHead, pacmanBody);
+    const foodFile = await fetch('3D Objects/Food.obj').then(result => result.text());
+    let food = WavefrontObjImporter.importShape(foodFile, [0.85, 0.95, 0.3], scene.gl);
+    food.scale([.07, .07, .07]);
+    food.translate([0, 0.12, 0]);
 
-    let game = new Game(map, pacman);
+    let pacman = new Pacman(pacmanHead, pacmanBody);
+    let game = new Game(map, pacman, food);
+
+    //Ghosts
+    for(let i = 0; i < 8; i++) {
+        const ghostFile = await fetch('3D Objects/Ghost.obj').then(result => result.text());
+        let ghost = WavefrontObjImporter.importShape(ghostFile, [Math.random(), Math.random(), Math.random()], scene.gl);
+        ghost.scale([.09, .09, .09]);
+        ghost.translate([0, 0.1, 0]);
+
+        const eyesFile = await fetch('3D Objects/Eyes.obj').then(result => result.text());
+        let eyes = WavefrontObjImporter.importShape(eyesFile, [1.0, 1.0, 1.0], scene.gl);
+        eyes.scale([.09, .09, .09]);
+        eyes.translate([0, 0.1, 0]);
+
+        let gh = new Ghost(ghost, eyes);
+        game.addGhost(gh);
+    }
+
     scene.setGame(game);
     scene.startGame();
 }
