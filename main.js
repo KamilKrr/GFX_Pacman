@@ -53,7 +53,7 @@ window.onload = async () => {
 
     camera = new Camera(canvas);
     light = new Light(light);
-    light.translate([0.0, 10.0, 10.0], true);
+    light.translate([5.0, 10.0, 5.0], true);
     scene = new Scene();
     scene.setCamera(camera);
     scene.setLight(light);

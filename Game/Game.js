@@ -12,6 +12,7 @@ class Game {
         "ArrowRight": () => this.pacman.setDirection('right'),
         "ArrowUp": () => this.pacman.setDirection('up'),
         "ArrowDown": () => this.pacman.setDirection('down'),
+        " ": () => this.pacman.jump(),
       }[event.key];
       callback?.();
     };
@@ -34,12 +35,12 @@ class Game {
     this.#deregisterEventListeners();
   }
 
-  update(now) {
+  update(now, camera) {
     let delta = now - this.then;
     delta *= 0.0005;
     this.then = now;
 
-    this.pacman.update(delta, this.map.map);
+    this.pacman.update(delta, this.map.map, camera);
   }
 
   render(camera) {

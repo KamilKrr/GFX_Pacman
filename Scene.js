@@ -37,7 +37,7 @@ class Scene {
   }
 
   update(now) {
-    this.game.update(now);
+    this.game.update(now, camera);
   }
   
   render(now) {
@@ -48,7 +48,7 @@ class Scene {
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    this.gl.uniform4fv(currentShaderProgram.uniforms.lightPosition, this.light.getTranslation(this.camera));
+    this.light.draw(camera, this.gl);
 
     this.shapes.forEach(shape => {
       shape.draw(this.camera);

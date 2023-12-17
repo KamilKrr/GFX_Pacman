@@ -7,16 +7,56 @@ class Pacman {
     this.currentRotation = 90;
     this.mouthRotation = 45;
     this.isOpeningMouth = true;
+
+    this.verticalPosition = 0;
+    this.gravity = 30;
+    this.jumpForce = 4;
+    this.isJumping = false;
+    this.isDoubleJump = false;
+    this.currentJumpForce = 0;
+    this.wasInAir = false;
   }
 
   setDirection(direction) {
     this.nextDirection = direction;
   }
 
-  update(delta, map) {
-    this.#move(delta, map);
+  update(delta, map, camera) {
+    if(this.verticalPosition <= 0.05) {
+      if(this.wasInAir) {
+        this.isJumping = false;
+        this.isDoubleJump = false;
+        this.wasInAir = false;
+        this.currentJumpForce = 0;
+      }
+    }else{
+      this.wasInAir = true;
+      this.currentJumpForce -= this.gravity * delta;
+    }
+
+    this.#move(delta, map, camera);
     this.#orient(delta);
+    this.#animateJump(delta);
     this.#animate(delta);
+  }
+
+  jump() {
+    if(this.isJumping){
+      if(this.isDoubleJump) return;
+      this.isDoubleJump = true;
+    }
+
+    this.isJumping = true;
+    this.currentJumpForce = this.jumpForce;
+  }
+
+  #animateJump(delta) {
+    if(this.isJumping) {
+      this.verticalPosition += this.currentJumpForce * delta;
+
+      this.head.translate([0, this.currentJumpForce * delta, 0], true);
+      this.body.translate([0, this.currentJumpForce * delta, 0], true);
+    }
   }
 
 
@@ -65,19 +105,19 @@ class Pacman {
         return 0;
     }
   }
-  #move(delta, map) {
+  #move(delta, map, camera) {
     let current = this.#getNextField(this.currentDirection);
     let next = this.#getNextField(this.nextDirection);
 
     if(this.#isAtCenter() || this.#isOppositeDirection(current, next)){
       if(!this.hasCollidedWithWall(this.xPos + next.x * delta, this.yPos + next.y * delta, map, this.nextDirection)){
         this.currentDirection = this.nextDirection;
-        this.#translate(next.x * delta, next.y * delta, this.nextDirection);
+        this.#translate(next.x * delta, next.y * delta, camera);
         return;
       }
     }
     if(this.hasCollidedWithWall(this.xPos + current.x * delta, this.yPos + current.y * delta, map, this.currentDirection)) return;
-    this.#translate(current.x * delta, current.y * delta);
+    this.#translate(current.x * delta, current.y * delta, camera);
   }
 
   #isOppositeDirection(current, next) {
@@ -148,13 +188,15 @@ class Pacman {
 
     this.head.translate([this.xPos, 0.1, this.yPos]);
     this.body.translate([this.xPos, 0.1, this.yPos]);
+    camera.translate([-this.xPos, 0, -this.yPos], false);
   }
 
-  #translate(x, y) {
+  #translate(x, y, camera) {
     this.xPos += x;
     this.yPos += y;
     this.head.translate([x, 0, y], true);
     this.body.translate([x, 0, y], true);
+    camera.translate([-x, 0, -y], false);
   }
 
   #rotate(angle) {

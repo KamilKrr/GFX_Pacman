@@ -2,17 +2,14 @@ class Light extends SceneObject {
   constructor(scene) {
     super();
   }
-  
-  getTranslation(camera) {
 
+  draw(camera, gl) {
     const lightViewMatrix = mat4.create();
-    mat4.mul(lightViewMatrix, this.modelMatrix, lightViewMatrix);
-    
+    mat4.mul(lightViewMatrix, this.modelMatrix, camera.modelMatrix);
+
     const lightPosition = vec4.create();
-    mat4.getTranslation(lightPosition, lightViewMatrix);
-    lightPosition[3] = 1.0;
-    
-    return lightPosition;
-    
+    vec4.set(lightPosition, lightViewMatrix[12], lightViewMatrix[13], lightViewMatrix[14], 1.0);
+
+    gl.uniform4fv(currentShaderProgram.uniforms.lightPosition, lightPosition);
   }
 }
