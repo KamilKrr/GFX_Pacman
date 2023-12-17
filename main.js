@@ -74,11 +74,11 @@ window.onload = async () => {
 
 async function loadObjFiles() {
     const wallFileBlue = await fetch('3D Objects/Wall.obj').then(result => result.text());
-    let wallBlue = WavefrontObjImporter.importShape(wallFileBlue, [0.2, 0.2, 0.9], scene.gl);
+    let wallBlue = WavefrontObjImporter.importShape(wallFileBlue, [0.2, 0.2, 1.0], scene.gl);
     wallBlue.scale([.1, .1, .1]);
 
     const wallFileGreen = await fetch('3D Objects/Wall.obj').then(result => result.text());
-    let wallGreen = WavefrontObjImporter.importShape(wallFileGreen, [0.1, 0.3, 0.1], scene.gl);
+    let wallGreen = WavefrontObjImporter.importShape(wallFileGreen, [0, 0.2, 0.25], scene.gl);
     wallGreen.scale([.1, .1, .1]);
 
     const floorFile = await fetch('3D Objects/Floor.obj').then(result => result.text());

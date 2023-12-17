@@ -55,16 +55,16 @@ class Game {
     this.pacman.update(delta, this.map, camera);
 
     this.ghosts.forEach(g => {
-      g.update(delta, this.map, camera);
+      g.update(delta, this.map, camera, this.pacman);
     });
 
     this.#testCollision();
   }
 
   #testCollision() {
-    let distance = 0.2;
+    let distance = 0.18;
     this.ghosts.forEach(g => {
-      if(Math.abs(g.xPos - this.pacman.xPos) < distance && Math.abs(g.yPos - this.pacman.yPos) < distance) {
+      if(Math.abs(g.xPos - this.pacman.xPos) < distance && Math.abs(g.yPos - this.pacman.yPos) < distance && this.pacman.verticalPosition < 0.2) {
         g.hide();
       }
     });

@@ -12,6 +12,13 @@ class GameMap {
         [0, 1, 0, 1, 0]
       ],
       [
+        [0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 1],
+        [0, 1, 0, 0, 0],
+        [0, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0]
+      ],
+      [
         [0, 0, 0, 0, 0],
         [1, 1, 0, 1, 1],
         [0, 0, 0, 0, 0],
@@ -99,7 +106,7 @@ class GameMap {
     do {
       x = Math.floor(Math.random() * (this.map.length - 1));
       y = Math.floor(Math.random() * (this.map.length - 1));
-    }while(this.map[y][x] !== 0)
+    }while(this.map[y][x] !== 0 || this.map[y][x+1] !== 0)
 
     return [x, y];
   }

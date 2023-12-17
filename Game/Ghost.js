@@ -7,15 +7,18 @@ class Ghost {
     this.nextDirection = 'right';
     this.currentRotation = 90;
     this.directions = ['up', 'right', 'left', 'down'];
+
+    this.currentEyeRotation = 90;
   }
 
-  update(delta, gameMap, camera) {
+  update(delta, gameMap, camera, pacman) {
     this.#move(delta, gameMap.map, camera);
-    this.#orient(delta);
+    this.#orientPacman(delta);
+    this.#orientEyes(delta, pacman);
   }
 
 
-  #orient(delta) {
+  #orientPacman(delta) {
     let targetRotation = this.#getTargetRotationAngle();
 
     if(Math.abs(this.currentRotation - targetRotation) < 3) return;
@@ -27,6 +30,19 @@ class Ghost {
       this.#rotate(1000 * delta);
     }else {
       this.#rotate(-1000 * delta);
+    }
+  }
+
+  #orientEyes(delta, pacman) {
+    let targetRotation = this.#getAngleToPacman(pacman);
+
+    let clockwiseRotation = (targetRotation - this.currentEyeRotation + 360) % 360;
+    let counterclockwiseRotation = (this.currentEyeRotation - targetRotation + 360) % 360;
+
+    if (clockwiseRotation < counterclockwiseRotation) {
+      this.#rotateEyes(1000 * delta);
+    }else {
+      this.#rotateEyes(-1000 * delta);
     }
   }
 
@@ -146,16 +162,31 @@ class Ghost {
     this.currentRotation = ((this.currentRotation % 360) + 360) % 360;
 
     this.body.translate([-this.xPos, 0, -this.yPos], true);
-    this.eyes.translate([-this.xPos, 0, -this.yPos], true);
     this.body.rotate(angle * (Math.PI/180), [0, 1, 0], true);
-    this.eyes.rotate(angle * (Math.PI/180), [0, 1, 0], true);
     this.body.translate([this.xPos, 0, this.yPos], true);
+  }
+
+  #getAngleToPacman(pacman) {
+    const angleRad = Math.atan2(pacman.yPos - this.yPos, pacman.xPos - this.xPos);
+    let angleDeg = (angleRad * (180 / Math.PI) + 360) % 360;
+    angleDeg = (360 - angleDeg + 90) % 360;
+
+    return angleDeg;
+  }
+
+  #rotateEyes(angle) {
+    this.currentEyeRotation += angle;
+    this.currentEyeRotation = ((this.currentEyeRotation % 360) + 360) % 360;
+
+    this.eyes.translate([-this.xPos, 0, -this.yPos], true);
+    this.eyes.rotate(angle * (Math.PI / 180), [0, 1, 0], true);
     this.eyes.translate([this.xPos, 0, this.yPos], true);
   }
 
+
   hide() {
     this.body.hide();
-    this.eyes.hide(); 
+    this.eyes.hide();
   }
 
 }

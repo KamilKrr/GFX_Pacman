@@ -47,7 +47,7 @@ class Pacman {
     if(this.#isAtCenter(0.05)) {
       let x = Math.floor((this.xPos + 0.05) / 0.2);
       let y = Math.floor((this.yPos + 0.05) / 0.2);
-      if(foodMap[y][x]){
+      if(this.verticalPosition < 0.2 && foodMap[y][x]){
         this.collectedFood++;
         foodMap[y][x].hide();
       }
