@@ -65,32 +65,6 @@ window.onload = async () => {
     let cameraInteractionHandler = new CameraInteractionHandler(scene);
     cameraInteractionHandler.registerInputListeners();
 
-    let shapeInteractionHandler = new ShapeInteractionHandler(scene);
-    shapeInteractionHandler.registerInputListeners();
-
-    let shaderInteractionHandler = new ShaderInteractionHandler(scene);
-    shaderInteractionHandler.registerInputListeners();
-
-    let lightInteractionHandler = new LightInteractionHandler(scene);
-    lightInteractionHandler.registerInputListeners();
-
-
-    window.addEventListener("keydown", (event) => {
-        if(event.key == ' '){
-            cameraInteractionHandler.canUseArrowKeys = true;
-            shapeInteractionHandler.canUseArrowKeys = false;
-            lightInteractionHandler.canUseArrowKeys = false;
-        } else if(event.key >= 0 && event.key <= 9) {
-            cameraInteractionHandler.canUseArrowKeys = false;
-            shapeInteractionHandler.canUseArrowKeys = true;
-            lightInteractionHandler.canUseArrowKeys = false;
-        } else if(event.key == 'L') {
-            lightInteractionHandler.canUseArrowKeys = !lightInteractionHandler.canUseArrowKeys;
-            shapeInteractionHandler.canUseArrowKeys = !lightInteractionHandler.canUseArrowKeys;
-            cameraInteractionHandler.canUseArrowKeys = false;
-        }
-    });
-
     /* --------- Load some data from external files - only works with an http server --------- */
     await loadObjFiles();
 
@@ -112,11 +86,27 @@ async function loadObjFiles() {
     floor.scale([.1, .1, .1]);
 
     let map = new GameMap([wallBlue, wallGreen], [floor]);
-    scene.setMap(map);
+
+    const pacmanHeadFile = await fetch('3D Objects/PacmanHead.obj').then(result => result.text());
+    let pacmanHead = WavefrontObjImporter.importShape(pacmanHeadFile, [0.85, 0.95, 0.3], scene.gl);
+    pacmanHead.scale([.1, .1, .1]);
+    pacmanHead.translate([0, 0.1, 0]);
+
+    const pacmanBodyFile = await fetch('3D Objects/PacmanBody.obj').then(result => result.text());
+    let pacmanBody = WavefrontObjImporter.importShape(pacmanBodyFile, [0.85, 0.95, 0.3], scene.gl);
+    pacmanBody.scale([.1, .1, .1]);
+    pacmanBody.translate([0, 0.1, 0]);
+
+    let pacman = new Pacman(pacmanHead, pacmanBody);
+
+    let game = new Game(map, pacman);
+    scene.setGame(game);
+    scene.startGame();
 }
 
 
 function render(now) {
+    scene.update(now);
     scene.render(now);
     requestAnimationFrame(render)
 }

@@ -34,11 +34,13 @@ class GameMap {
       ],
     ];
 
+
+  }
+
+  createMap() {
     this.#generateMap();
     this.#buildMap();
   }
-
-
 
   #generateMap() {
     let size = 5;
@@ -70,24 +72,35 @@ class GameMap {
     this.objects = [];
     let i = 0;
     for(let y = 0; y < this.map.length; y++) {
-      for(let x = 0; x < this.map[y].length; x++) {
-        if(this.map[y][x] === 0){
+      for (let x = 0; x < this.map[y].length; x++) {
+        if (this.map[y][x] === 0) {
           let tile = this.floors[0].copy();
           tile.translate([x * 0.2, 0, y * 0.2]);
 
           this.objects.push(tile);
-        }else {
+        } else {
           let tile = this.walls[(x + y) % 2].copy();
           tile.translate([x * 0.2, 0, y * 0.2]);
-          
+
           this.objects.push(tile);
         }
       }
     }
-    
   }
-  
-  render() {
-    
+
+  getPacmanSpawnPosition() {
+    let x, y;
+    do {
+      x = Math.floor(Math.random() * this.map.length);
+      y = Math.floor(Math.random() * this.map.length);
+    }while(this.map[y][x] !== 0)
+
+    return [x, y];
+  }
+
+  draw(camera) {
+    this.objects.forEach(shape => {
+      shape.draw(camera);
+    });
   }
 }

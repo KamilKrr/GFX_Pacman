@@ -12,8 +12,8 @@ class Scene {
     this.camera = camera;
   }
 
-  setMap(map) {
-    this.map = map;
+  setGame(game) {
+    this.game = game;
   }
 
   setLight(light) {
@@ -31,6 +31,14 @@ class Scene {
   addSupportShape(shape) {
     this.supportShapes.push(shape);
   }
+
+  startGame() {
+    this.game.initGame();
+  }
+
+  update(now) {
+    this.game.update(now);
+  }
   
   render(now) {
     /* --------- calculate time per frame in seconds --------- */
@@ -46,9 +54,7 @@ class Scene {
       shape.draw(this.camera);
     });
 
-    this.map.objects.forEach(shape => {
-      shape.draw(this.camera);
-    });
+    this.game.render(this.camera);
 
     this.supportShapes.forEach(shape => {
       shape.draw(this.camera);

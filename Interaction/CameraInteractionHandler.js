@@ -8,19 +8,6 @@ class CameraInteractionHandler {
   }
   
   registerInputListeners() {
-
-    // KEYBOARD MEVEMENT
-    window.addEventListener("keydown", (event) => {
-      let velocity = 0.05;
-
-      const callback = {
-        "ArrowLeft"  : () => this.canUseArrowKeys && this.#translateCamera([-velocity, 0, 0]),
-        "ArrowRight"  : () => this.canUseArrowKeys && this.#translateCamera([velocity, 0, 0]),
-        "ArrowUp"  : () => this.canUseArrowKeys && this.#translateCamera([0, velocity, 0]),
-        "ArrowDown"  : () => this.canUseArrowKeys && this.#translateCamera([0, -velocity, 0]),
-      }[event.key]
-      callback?.()
-    })
     
     window.addEventListener("mouseup", () => { this.isMouseDown = false; });
     window.addEventListener("mousedown", (event) => {
