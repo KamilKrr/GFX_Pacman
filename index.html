@@ -21,10 +21,6 @@
     <script type="text/javascript" src="SceneObjects/Shapes/CoordinateSystem.js"></script>
     <script type="text/javascript" src="SceneObjects/Camera.js"></script>
     <script type="text/javascript" src="SceneObjects/Light.js"></script>
-    <script type="text/javascript" src="Interaction/CameraInteractionHandler.js"></script>
-    <script type="text/javascript" src="Interaction/ShapeInteractionHandler.js"></script>
-    <script type="text/javascript" src="Interaction/ShaderInteractionHandler.js"></script>
-    <script type="text/javascript" src="Interaction/LightInteractionHandler.js"></script>
     <script type="text/javascript" src="WavefrontObjImporter.js"></script>
     <script type="text/javascript" src="main.js"></script>
     <script type="text/javascript" src="helpers.js"></script>
@@ -127,6 +123,18 @@
         </div>
     </div>
     <canvas id="canvas"></canvas>
+    <div class="popover" popover>
+        <section>
+            <span class="message"></span>
+            <span class="score-text">
+            Score: <span class="score"></span>
+        </span>
+            <span class="info">Choose Map size:</span>
+            <input class="slider" type="range" min="0" max="2" value="0">
+            <span class="size">Small</span>
+            <button class="button">Play again</button>
+        </section>
+    </div>
 </body>
 
 

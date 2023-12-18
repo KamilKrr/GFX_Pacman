@@ -17,13 +17,15 @@ class Pacman {
     this.wasInAir = false;
 
     this.collectedFood = 0;
+    this.xPos = 0;
+    this.yPos = 0;
   }
 
   setDirection(direction) {
     this.nextDirection = direction;
   }
 
-  update(delta, gameMap, camera, addScore, enablePowerMode) {
+  update(delta, gameMap, camera, addScore, enablePowerMode, winGame) {
     if(this.verticalPosition <= 0.05) {
       if(this.wasInAir) {
         this.isJumping = false;
@@ -40,10 +42,10 @@ class Pacman {
     this.#orient(delta);
     this.#animateJump(delta);
     this.#animate(delta);
-    this.#eatFood(gameMap.foodMap, gameMap.powerFoodMap, addScore, enablePowerMode);
+    this.#eatFood(gameMap.foodMap, gameMap.powerFoodMap, addScore, enablePowerMode, winGame);
   }
 
-  #eatFood(foodMap, powerFoodMap, addScore, enablePowerMode) {
+  #eatFood(foodMap, powerFoodMap, addScore, enablePowerMode, winGame) {
     if(this.#isAtCenter(0.05)) {
       let x = Math.floor((this.xPos + 0.05) / 0.2);
       let y = Math.floor((this.yPos + 0.05) / 0.2);
@@ -56,7 +58,7 @@ class Pacman {
         addScore(10);
       }
     }
-    this.#updateScore(foodMap);
+    this.#updateScore(foodMap, winGame);
   }
 
   jump() {
@@ -175,6 +177,7 @@ class Pacman {
   }
 
   hasCollidedWithWall(x, y, map, direction) {
+
     let xC = 0;
     let yC = 0;
     if(direction === 'right'){
@@ -190,11 +193,13 @@ class Pacman {
       yC = Math.floor((y + 0.1) / 0.2);
       xC = Math.floor(x / 0.2);
     }
-
     return map[yC][xC];
   }
 
   setPosition(x, y) {
+    this.currentRotation = 90;
+    this.collectedFood = 0;
+    camera.translate([this.xPos, 0, this.yPos], false);
     this.head.modelMatrix = mat4.create();
     this.body.modelMatrix = mat4.create();
 
@@ -226,7 +231,7 @@ class Pacman {
     this.body.translate([this.xPos, 0, this.yPos], true);
   }
 
-  #updateScore(foodMap) {
+  #updateScore(foodMap, winGame) {
     let maxPoints = 0;
     foodMap.forEach(r => {
       r.forEach(v => {
@@ -234,6 +239,9 @@ class Pacman {
       })
     })
     document.querySelector(".points").innerHTML = this.collectedFood + "/" + maxPoints;
+    if(maxPoints === this.collectedFood) {
+      winGame();
+    }
   }
 
 }

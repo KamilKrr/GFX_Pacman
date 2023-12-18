@@ -61,7 +61,7 @@ window.onload = async () => {
     scene.setGlContext(gl);
 
     window.addEventListener("keydown", (e) => {
-        if(e.key == "v"){
+        if(e.key === "v"){
             shear = !shear;
             if(shear)
                 camera.shear();
@@ -74,9 +74,6 @@ window.onload = async () => {
     shaderPrograms.phongSpecular = new ShaderProgram(gl, shaders.vertexPhong, shaders.fragmentPhongSpecular, shaderInfo, camera);
     shaderPrograms.phongSpecular.enable();
     camera.init();
-
-    let cameraInteractionHandler = new CameraInteractionHandler(scene);
-    cameraInteractionHandler.registerInputListeners();
 
     /* --------- Load some data from external files - only works with an http server --------- */
     await loadObjFiles();
@@ -123,7 +120,7 @@ async function loadObjFiles() {
     let game = new Game(map, pacman, food, powerFood);
 
     //Ghosts
-    for(let i = 0; i < 8; i++) {
+    for(let i = 0; i < 9; i++) {
         const ghostFile = await fetch('3D Objects/Ghost.obj').then(result => result.text());
         let ghost = WavefrontObjImporter.importShape(ghostFile, [Math.random(), Math.random(), Math.random()], scene.gl);
         ghost.scale([.09, .09, .09]);

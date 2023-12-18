@@ -186,15 +186,23 @@ class Ghost {
     this.eyes.translate([this.xPos, 0, this.yPos], true);
   }
 
-  eat() {
-    this.isAlive = false;
+  show() {
+    this.body.show();
+    this.eyes.show();
+  }
+
+  hide() {
     this.body.hide();
     this.eyes.hide();
+  }
+
+  eat() {
+    this.isAlive = false;
+    this.hide();
 
     setTimeout(() => {
       this.isAlive = true;
-      this.body.show();
-      this.eyes.show();
+      this.show();
     }, 10000);
   }
 

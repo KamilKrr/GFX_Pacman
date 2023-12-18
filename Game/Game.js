@@ -10,12 +10,15 @@ class Game {
     this.score = 0;
     this.powerModeRemainingSeconds = 0;
     this.lives = 3;
-    this.gameLost = false;
+    this.gameFrozen = false;
+    this.size = 2;
+
+    this.#registerEventListeners();
   }
 
   addScore = (score) => {
     this.score += score;
-    document.querySelector('.score').innerHTML = this.score;
+    [... document.querySelectorAll('.score')].map(i => i.innerHTML = this.score);
   }
 
   enablePowerMode = () => {
@@ -47,6 +50,26 @@ class Game {
     };
 
     this.powerModeIntervalId = setInterval(handlePowerModeCountdown, 1000);
+
+    document.querySelector(".button").addEventListener("click", () => {
+      this.initGame();
+      document.querySelector(".popover").hidePopover();
+    })
+
+    document.querySelector(".slider").addEventListener("input", e => {
+      let text = "small";
+      let val = parseInt(e.target.value);
+
+      if(val === 1) {
+        text = "medium";
+      }else if(val === 2){
+        text = "large";
+      }
+
+      document.querySelector(".size").innerHTML = text;
+
+      this.size = 2 + val;
+    });
   }
 
   #deregisterEventListeners() {
@@ -54,30 +77,47 @@ class Game {
   }
 
   initGame() {
-    this.map.createMap(4, this.food, this.powerFood);
+    this.then = 0;
+    this.score = 0;
+    this.powerModeRemainingSeconds = 0;
+    this.lives = 3;
+
+    this.map.createMap(this.size, this.food, this.powerFood);
     let spawnPosition = this.map.getPacmanSpawnPosition();
     this.pacman.setPosition(spawnPosition[0], spawnPosition[1]);
-
     this.ghosts.forEach(g => {
       let spawnPosition = this.map.getPacmanSpawnPosition();
       g.setPosition(spawnPosition[0], spawnPosition[1]);
     });
-    this.#registerEventListeners();
+    let i = 0;
+    this.ghosts.forEach(g => {
+      if(i < 3 + (this.size - 2) * 3) {
+        g.show();
+        g.isAlive = true;
+      }else {
+        g.hide();
+        g.isAlive = false;
+      }
+      i++;
+    });
     this.#updateGhostsOverlay();
     this.#updateLivesOverlay();
+    this.gameFrozen = false;
   }
 
-  endGame() {
-    this.#deregisterEventListeners();
+  #showPopup(message) {
+    document.querySelector(".message").innerHTML = message;
+    document.querySelector(".popover").showPopover();
   }
 
   update(now, camera) {
-    if(this.gameLost) return;
+    if(this.gameFrozen) return;
+    if(this.then === 0) this.then = now;
     let delta = now - this.then;
     delta *= 0.0005;
     this.then = now;
 
-    this.pacman.update(delta, this.map, camera, this.addScore, this.enablePowerMode);
+    this.pacman.update(delta, this.map, camera, this.addScore, this.enablePowerMode, this.winGame);
 
     this.ghosts.forEach(g => {
       g.update(delta, this.map, camera, this.pacman);
@@ -85,6 +125,7 @@ class Game {
 
     this.#testCollision();
     this.#updatePowerModeOverlay();
+    this.#updateGhostsOverlay();
   }
 
   #testCollision() {
@@ -143,7 +184,13 @@ class Game {
   }
 
   #looseGame() {
-    this.gameLost = true;
+    this.gameFrozen = true;
+    this.#showPopup("Game over");
+  }
+
+  winGame = () => {
+    this.gameFrozen = true;
+    this.#showPopup("You Win");
   }
 
   render(camera) {
