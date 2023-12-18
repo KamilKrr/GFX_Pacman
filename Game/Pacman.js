@@ -130,8 +130,8 @@ class Pacman {
     let current = this.#getNextField(this.currentDirection);
     let next = this.#getNextField(this.nextDirection);
 
-    if(this.#isAtCenter() || this.#isOppositeDirection(current, next)){
-      if(!this.hasCollidedWithWall(this.xPos + next.x * delta, this.yPos + next.y * delta, map, this.nextDirection)){
+    if(this.currentDirection !== this.nextDirection && (this.#isAtCenter(0.01) || this.#isOppositeDirection(current, next))){
+      if(!this.hasCollidedWithWall(this.xPos + next.x * 0.1, this.yPos + next.y * 0.1, map, this.nextDirection)){
         this.currentDirection = this.nextDirection;
         this.#translate(next.x * delta, next.y * delta, camera);
         return;
@@ -200,6 +200,8 @@ class Pacman {
     this.currentRotation = 90;
     this.collectedFood = 0;
     camera.translate([this.xPos, 0, this.yPos], false);
+    this.head.rotate((90 - this.currentRotation) * (Math.PI/180), [0, 0, 1]);
+
     this.head.modelMatrix = mat4.create();
     this.body.modelMatrix = mat4.create();
 
