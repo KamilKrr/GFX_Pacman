@@ -23,7 +23,7 @@ class Pacman {
     this.nextDirection = direction;
   }
 
-  update(delta, gameMap, camera, addScore) {
+  update(delta, gameMap, camera, addScore, enablePowerMode) {
     if(this.verticalPosition <= 0.05) {
       if(this.wasInAir) {
         this.isJumping = false;
@@ -40,14 +40,17 @@ class Pacman {
     this.#orient(delta);
     this.#animateJump(delta);
     this.#animate(delta);
-    this.#eatFood(gameMap.foodMap, addScore);
+    this.#eatFood(gameMap.foodMap, gameMap.powerFoodMap, addScore, enablePowerMode);
   }
 
-  #eatFood(foodMap, addScore) {
+  #eatFood(foodMap, powerFoodMap, addScore, enablePowerMode) {
     if(this.#isAtCenter(0.05)) {
       let x = Math.floor((this.xPos + 0.05) / 0.2);
       let y = Math.floor((this.yPos + 0.05) / 0.2);
       if(this.verticalPosition < 0.2 && !foodMap[y][x].isHidden){
+        if(powerFoodMap[y][x] === 1){
+          enablePowerMode();
+        }
         this.collectedFood++;
         foodMap[y][x].hide();
         addScore(10);

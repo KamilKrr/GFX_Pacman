@@ -36,6 +36,7 @@ let currentShaderProgram = null;
 let camera = null;
 let light = null;
 let scene = null;
+let shear = true;
 
 window.onload = async () => {
 
@@ -58,6 +59,17 @@ window.onload = async () => {
     scene.setCamera(camera);
     scene.setLight(light);
     scene.setGlContext(gl);
+
+    window.addEventListener("keydown", (e) => {
+        if(e.key == "v"){
+            shear = !shear;
+            if(shear)
+                camera.shear();
+            else {
+                camera.unshear()
+            }
+        }
+    });
 
     shaderPrograms.phongSpecular = new ShaderProgram(gl, shaders.vertexPhong, shaders.fragmentPhongSpecular, shaderInfo, camera);
     shaderPrograms.phongSpecular.enable();
@@ -102,8 +114,12 @@ async function loadObjFiles() {
     food.scale([.07, .07, .07]);
     food.translate([0, 0.12, 0]);
 
+    let powerFood = WavefrontObjImporter.importShape(foodFile, [0.95, 0.2, 0.2], scene.gl);
+    powerFood.scale([.15, .15, .15]);
+    powerFood.translate([0, 0.12, 0]);
+
     let pacman = new Pacman(pacmanHead, pacmanBody);
-    let game = new Game(map, pacman, food);
+    let game = new Game(map, pacman, food, powerFood);
 
     //Ghosts
     for(let i = 0; i < 8; i++) {

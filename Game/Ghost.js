@@ -37,13 +37,15 @@ class Ghost {
   #orientEyes(delta, pacman) {
     let targetRotation = this.#getAngleToPacman(pacman);
 
+    if(Math.abs(this.currentRotation - targetRotation) < 5) return;
+
     let clockwiseRotation = (targetRotation - this.currentEyeRotation + 360) % 360;
     let counterclockwiseRotation = (this.currentEyeRotation - targetRotation + 360) % 360;
 
     if (clockwiseRotation < counterclockwiseRotation) {
-      this.#rotateEyes(1000 * delta);
+      this.#rotateEyes(400 * delta);
     }else {
-      this.#rotateEyes(-1000 * delta);
+      this.#rotateEyes(-400 * delta);
     }
   }
 

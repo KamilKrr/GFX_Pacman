@@ -12,11 +12,11 @@ class GameMap {
         [0, 1, 0, 1, 0]
       ],
       [
-        [0, 1, 0, 1, 1],
-        [0, 1, 0, 1, 1],
+        [0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0],
         [0, 1, 0, 0, 0],
-        [0, 1, 1, 0, 1],
-        [0, 0, 0, 0, 0]
+        [0, 1, 0, 1, 0]
       ],
       [
         [0, 0, 0, 0, 0],
@@ -39,21 +39,61 @@ class GameMap {
         [1, 0, 0, 0, 1],
         [1, 1, 0, 1, 1]
       ],
+      [
+        [0, 1, 0, 1, 1],
+        [0, 1, 0, 1, 1],
+        [0, 1, 0, 0, 0],
+        [0, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0]
+      ],
+      [
+        [0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0],
+        [0, 0, 0, 1, 0],
+        [1, 1, 0, 1, 0],
+        [1, 1, 0, 1, 0]
+      ],
     ];
-
-
   }
 
-  createMap(food) {
-    this.#generateMap();
-    this.#buildMap(food);
+  createMap(size, food, powerFood) {
+    do {
+      this.#generateMap(size);
+    }while(!this.#validateMap());
+
+    this.#buildMap(food, powerFood);
   }
 
-  #generateMap() {
-    let size = 5;
+  #validateMap() {
+    let copyArray = this.map.map(function(arr) {
+      return arr.slice();
+    });
 
+    let start = this.getPacmanSpawnPosition();
+    this.#floodFill(copyArray, start[0], start[1]);
+
+    for(let y = 0; y < copyArray.length; y++) {
+      for (let x = 0; x < copyArray[y].length; x++) {
+        if(copyArray[y][x] !== 1) return false;
+      }
+    }
+    return true;
+  }
+
+  #floodFill(arr, x, y) {
+    if(x < 0 || y < 0 || x >= arr.length || y >= arr.length) return;
+    if(arr[y][x] === 1) return;
+    arr[y][x] = 1;
+    this.#floodFill(arr, x+1, y);
+    this.#floodFill(arr, x-1, y);
+    this.#floodFill(arr, x, y+1);
+    this.#floodFill(arr, x, y-1);
+  }
+
+  #generateMap(size) {
     this.map = Array.from(Array(size*5), () => new Array(size*5));
     this.foodMap = Array.from(Array(size*5), () => new Array(size*5));
+    this.powerFoodMap = Array.from(Array(size*5), () => new Array(size*5));
 
     for (let y = 0; y < size; y++) {
       for (let x = 0; x < size; x++) {
@@ -76,7 +116,7 @@ class GameMap {
   }
 
 
-  #buildMap(food) {
+  #buildMap(food, powerFood) {
     this.objects = [];
     let i = 0;
     for(let y = 0; y < this.map.length; y++) {
@@ -85,7 +125,14 @@ class GameMap {
           let tile = this.floors[0].copy();
           tile.translate([x * 0.2, 0, y * 0.2]);
 
-          let foodCopy = food.copy();
+          let foodCopy = null;
+          if(Math.random() < 0.02) {
+            foodCopy = powerFood.copy();
+            this.powerFoodMap[y][x] = 1;
+          }else {
+            foodCopy = food.copy();
+          }
+
           foodCopy.translate([x * 0.2, 0, y * 0.2]);
           this.foodMap[y][x] = foodCopy;
 

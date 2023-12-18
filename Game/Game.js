@@ -1,13 +1,14 @@
 class Game {
-  constructor(map, pacman, food) {
+  constructor(map, pacman, food, powerFood) {
     this.map = map;
     this.pacman = pacman;
     this.food = food;
+    this.powerFood = powerFood;
     this.then = 0;
 
     this.ghosts = [];
     this.score = 0;
-    this.powerMode = false;
+    this.powerModeRemainingSeconds = 0;
     this.lives = 3;
     this.gameLost = false;
   }
@@ -15,6 +16,10 @@ class Game {
   addScore = (score) => {
     this.score += score;
     document.querySelector('.score').innerHTML = this.score;
+  }
+
+  enablePowerMode = () => {
+    this.powerModeRemainingSeconds += 10;
   }
 
   addGhost(ghost) {
@@ -34,6 +39,14 @@ class Game {
     };
 
     window.addEventListener("keydown", this.keyDownHandler);
+
+    const handlePowerModeCountdown = () => {
+      if (this.powerModeRemainingSeconds > 0) {
+        this.powerModeRemainingSeconds--;
+      }
+    };
+
+    this.powerModeIntervalId = setInterval(handlePowerModeCountdown, 1000);
   }
 
   #deregisterEventListeners() {
@@ -41,7 +54,7 @@ class Game {
   }
 
   initGame() {
-    this.map.createMap(this.food);
+    this.map.createMap(4, this.food, this.powerFood);
     let spawnPosition = this.map.getPacmanSpawnPosition();
     this.pacman.setPosition(spawnPosition[0], spawnPosition[1]);
 
@@ -64,13 +77,14 @@ class Game {
     delta *= 0.0005;
     this.then = now;
 
-    this.pacman.update(delta, this.map, camera, this.addScore);
+    this.pacman.update(delta, this.map, camera, this.addScore, this.enablePowerMode);
 
     this.ghosts.forEach(g => {
       g.update(delta, this.map, camera, this.pacman);
     });
 
     this.#testCollision();
+    this.#updatePowerModeOverlay();
   }
 
   #testCollision() {
@@ -81,7 +95,7 @@ class Game {
         Math.abs(g.xPos - this.pacman.xPos) < distance && Math.abs(g.yPos - this.pacman.yPos) < distance &&
         this.pacman.verticalPosition < 0.2
       ) {
-        if(this.powerMode) {
+        if(this.powerModeRemainingSeconds > 0) {
           this.#eatGhost(g);
         }else {
           this.#looseLive(g);
@@ -98,6 +112,16 @@ class Game {
     document.querySelector('.hearts').innerHTML = this.lives;
   }
 
+  #updatePowerModeOverlay() {
+    if(this.powerModeRemainingSeconds > 0) {
+      document.querySelector(".powermode").innerHTML = this.powerModeRemainingSeconds + "s";
+      document.querySelector(".powerstat").classList.remove("hidden");
+    }else {
+      document.querySelector(".powermode").innerHTML = "";
+      document.querySelector(".powerstat").classList.add("hidden");
+    }
+  }
+
   #eatGhost(ghost) {
     ghost.eat();
     this.addScore(500);
@@ -108,6 +132,7 @@ class Game {
     this.lives--;
     this.#updateLivesOverlay();
     ghost.eat();
+    this.#updateGhostsOverlay();
     this.addScore(-1000);
     if(this.lives <= 0) {
       this.#looseGame();
