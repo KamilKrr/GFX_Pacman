@@ -3,8 +3,11 @@
 
 <head>
     <meta charset="utf-8">
-    <title>WebGL Lab 1a Kamil Kruk</title>
-    
+    <title>WebGL Lab 1c Kamil Kruk</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
     <script type="text/javascript" src="gl-matrix-min.js"></script>
@@ -97,6 +100,28 @@
 </head>
 
 <body>
+    <div class="topbar">
+        <span>PacMania</span>
+        <section class="stats">
+            <div class="stat">
+                <span class="ghosts">0</span>
+                <img src="images/ghost.png">
+            </div>
+
+            <div class="stat">
+                <span class="points">0</span>
+                <img src="images/food.png">
+            </div>
+
+            <div class="stat">
+                <span class="hearts">0</span>
+                <img src="images/heart.webp">
+            </div>
+        </section>
+    </div>
+    <div class="overlay">
+        <span class="score">0</span>
+    </div>
     <canvas id="canvas"></canvas>
 </body>
 

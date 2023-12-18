@@ -21,10 +21,10 @@ class Shape extends SceneObject {
 
 
     this.Ka = 0.1;
-    this.Kd = 1.0;
-    this.Ks = 1.0;
-    this.shininessVal = 12;
-    this.ambientColor = vec3.fromValues(0.4, 0.4, 0.4);
+    this.Kd = 1.2;
+    this.Ks = 0.5;
+    this.shininessVal = 32;
+    this.ambientColor = vec3.fromValues(0.8, 0.8, 0.8);
     this.specularColor = vec3.fromValues(1.0, 1.0, 1.0);
   }
 

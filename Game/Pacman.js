@@ -23,7 +23,7 @@ class Pacman {
     this.nextDirection = direction;
   }
 
-  update(delta, gameMap, camera) {
+  update(delta, gameMap, camera, addScore) {
     if(this.verticalPosition <= 0.05) {
       if(this.wasInAir) {
         this.isJumping = false;
@@ -40,18 +40,20 @@ class Pacman {
     this.#orient(delta);
     this.#animateJump(delta);
     this.#animate(delta);
-    this.#eatFood(gameMap.foodMap);
+    this.#eatFood(gameMap.foodMap, addScore);
   }
 
-  #eatFood(foodMap) {
+  #eatFood(foodMap, addScore) {
     if(this.#isAtCenter(0.05)) {
       let x = Math.floor((this.xPos + 0.05) / 0.2);
       let y = Math.floor((this.yPos + 0.05) / 0.2);
-      if(this.verticalPosition < 0.2 && foodMap[y][x]){
+      if(this.verticalPosition < 0.2 && !foodMap[y][x].isHidden){
         this.collectedFood++;
         foodMap[y][x].hide();
+        addScore(10);
       }
     }
+    this.#updateScore(foodMap);
   }
 
   jump() {
@@ -219,6 +221,16 @@ class Pacman {
     this.body.rotate(angle * (Math.PI/180), [0, 1, 0], true);
     this.head.translate([this.xPos, 0, this.yPos], true);
     this.body.translate([this.xPos, 0, this.yPos], true);
+  }
+
+  #updateScore(foodMap) {
+    let maxPoints = 0;
+    foodMap.forEach(r => {
+      r.forEach(v => {
+        if(v) maxPoints++;
+      })
+    })
+    document.querySelector(".points").innerHTML = this.collectedFood + "/" + maxPoints;
   }
 
 }

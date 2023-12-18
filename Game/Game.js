@@ -6,6 +6,15 @@ class Game {
     this.then = 0;
 
     this.ghosts = [];
+    this.score = 0;
+    this.powerMode = false;
+    this.lives = 3;
+    this.gameLost = false;
+  }
+
+  addScore = (score) => {
+    this.score += score;
+    document.querySelector('.score').innerHTML = this.score;
   }
 
   addGhost(ghost) {
@@ -41,6 +50,8 @@ class Game {
       g.setPosition(spawnPosition[0], spawnPosition[1]);
     });
     this.#registerEventListeners();
+    this.#updateGhostsOverlay();
+    this.#updateLivesOverlay();
   }
 
   endGame() {
@@ -48,11 +59,12 @@ class Game {
   }
 
   update(now, camera) {
+    if(this.gameLost) return;
     let delta = now - this.then;
     delta *= 0.0005;
     this.then = now;
 
-    this.pacman.update(delta, this.map, camera);
+    this.pacman.update(delta, this.map, camera, this.addScore);
 
     this.ghosts.forEach(g => {
       g.update(delta, this.map, camera, this.pacman);
@@ -64,10 +76,46 @@ class Game {
   #testCollision() {
     let distance = 0.18;
     this.ghosts.forEach(g => {
-      if(Math.abs(g.xPos - this.pacman.xPos) < distance && Math.abs(g.yPos - this.pacman.yPos) < distance && this.pacman.verticalPosition < 0.2) {
-        g.hide();
+      if(
+        g.isAlive &&
+        Math.abs(g.xPos - this.pacman.xPos) < distance && Math.abs(g.yPos - this.pacman.yPos) < distance &&
+        this.pacman.verticalPosition < 0.2
+      ) {
+        if(this.powerMode) {
+          this.#eatGhost(g);
+        }else {
+          this.#looseLive(g);
+        }
       }
     });
+  }
+
+  #updateGhostsOverlay() {
+    document.querySelector('.ghosts').innerHTML = this.ghosts.filter((g) => g.isAlive).length;
+  }
+
+  #updateLivesOverlay() {
+    document.querySelector('.hearts').innerHTML = this.lives;
+  }
+
+  #eatGhost(ghost) {
+    ghost.eat();
+    this.addScore(500);
+    this.#updateGhostsOverlay();
+  }
+
+  #looseLive(ghost) {
+    this.lives--;
+    this.#updateLivesOverlay();
+    ghost.eat();
+    this.addScore(-1000);
+    if(this.lives <= 0) {
+      this.#looseGame();
+    }
+  }
+
+  #looseGame() {
+    this.gameLost = true;
   }
 
   render(camera) {

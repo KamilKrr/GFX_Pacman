@@ -9,6 +9,7 @@ class Ghost {
     this.directions = ['up', 'right', 'left', 'down'];
 
     this.currentEyeRotation = 90;
+    this.isAlive = true;
   }
 
   update(delta, gameMap, camera, pacman) {
@@ -183,8 +184,8 @@ class Ghost {
     this.eyes.translate([this.xPos, 0, this.yPos], true);
   }
 
-
-  hide() {
+  eat() {
+    this.isAlive = false;
     this.body.hide();
     this.eyes.hide();
   }
