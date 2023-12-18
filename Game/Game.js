@@ -124,6 +124,9 @@ class Game {
 
   #eatGhost(ghost) {
     ghost.eat();
+    let spawnPosition = this.map.getPacmanSpawnPosition();
+    ghost.setPosition(spawnPosition[0], spawnPosition[1]);
+
     this.addScore(500);
     this.#updateGhostsOverlay();
   }

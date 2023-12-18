@@ -1,36 +1,46 @@
 class Camera extends SceneObject {
-  constructor(canvas) {
+  constructor(canvas, gl) {
     super();
-
+    this.gl = gl;
+    this.canvas = canvas;
     this.projectionMatrix = mat4.create();
-
-    this.#initializeCamera(canvas);
   }
 
-  #initializeCamera(canvas) {
+  init() {
+    this.#initializeCamera();
+  }
+
+  #initializeCamera() {
     this.projectionMatrix = mat4.create();
-    mat4.ortho(this.projectionMatrix,-canvas.clientWidth * 0.001, canvas.clientWidth * 0.001, -canvas.clientHeight * 0.001, canvas.clientHeight * 0.001, 0.1, 100);
+    mat4.ortho(this.projectionMatrix,-this.canvas.clientWidth * 0.001, this.canvas.clientWidth * 0.001, -this.canvas.clientHeight * 0.001, this.canvas.clientHeight * 0.001, 0.1, 100);
 
     mat4.lookAt(this.modelMatrix, [0, 1, 2], [0, 0, 0], [0, 1, 0]);
+
+    let projectionMatrixLocation = this.gl.getUniformLocation(currentShaderProgram.program, shaderInfo.uniforms.projectionMatrix);
+    this.gl.uniformMatrix4fv(projectionMatrixLocation, this.gl.FALSE, this.projectionMatrix);
 
     this.shear();
   }
 
   shear() {
-    const shearMatrix = mat4.create();
+    this.projectionMatrix[8] = -0.2;
+    this.projectionMatrix[9] = -0.2;
+    this.projectionMatrix[12] = -0.44;
+    this.projectionMatrix[13] = -0.44;
+    this.projectionMatrix[14] = -0.9;
 
-    shearMatrix[8] = -0.3;
-    shearMatrix[9] = -0.3;
-
-    mat4.mul(this.modelMatrix, this.modelMatrix, shearMatrix);
+    let projectionMatrixLocation = this.gl.getUniformLocation(currentShaderProgram.program, shaderInfo.uniforms.projectionMatrix);
+    this.gl.uniformMatrix4fv(projectionMatrixLocation, this.gl.FALSE, this.projectionMatrix);
   }
 
   unshear() {
-    const shearMatrix = mat4.create();
+    this.projectionMatrix[8] = 0;
+    this.projectionMatrix[9] = 0;
+    this.projectionMatrix[12] = 0;
+    this.projectionMatrix[13] = 0;
+    this.projectionMatrix[14] = 0;
 
-    shearMatrix[8] = 0.3;
-    shearMatrix[9] = 0.3;
-
-    mat4.mul(this.modelMatrix, this.modelMatrix, shearMatrix);
+    let projectionMatrixLocation = this.gl.getUniformLocation(currentShaderProgram.program, shaderInfo.uniforms.projectionMatrix);
+    this.gl.uniformMatrix4fv(projectionMatrixLocation, this.gl.FALSE, this.projectionMatrix);
   }
 }

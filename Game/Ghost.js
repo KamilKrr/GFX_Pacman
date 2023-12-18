@@ -190,6 +190,12 @@ class Ghost {
     this.isAlive = false;
     this.body.hide();
     this.eyes.hide();
+
+    setTimeout(() => {
+      this.isAlive = true;
+      this.body.show();
+      this.eyes.show();
+    }, 10000);
   }
 
 }

@@ -52,7 +52,7 @@ window.onload = async () => {
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
     gl.clearColor(0.729, 0.764, 0.674, 1);
 
-    camera = new Camera(canvas);
+    camera = new Camera(canvas, gl);
     light = new Light(light);
     light.translate([5.0, 10.0, 5.0], true);
     scene = new Scene();
@@ -73,6 +73,7 @@ window.onload = async () => {
 
     shaderPrograms.phongSpecular = new ShaderProgram(gl, shaders.vertexPhong, shaders.fragmentPhongSpecular, shaderInfo, camera);
     shaderPrograms.phongSpecular.enable();
+    camera.init();
 
     let cameraInteractionHandler = new CameraInteractionHandler(scene);
     cameraInteractionHandler.registerInputListeners();
