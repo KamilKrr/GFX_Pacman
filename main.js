@@ -4,6 +4,8 @@ const toRad = glMatrix.glMatrix.toRadian;
 const shaders = {
     vertexPhong: "v-phong",
     fragmentPhongSpecular: "f-phong-specular",
+    vertexShadow: "v-shadow",
+    fragmentShadow: "f-shadow",
 }
 
 const shaderInfo = {
@@ -29,6 +31,7 @@ const shaderInfo = {
 
 const shaderPrograms = {
     phongSpecular: null,
+    shadow: null,
 }
 
 let currentShaderProgram = null;
@@ -48,13 +51,17 @@ window.onload = async () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    const ext = gl.getExtension('WEBGL_depth_texture');
+    if (!ext) {
+        return alert('need WEBGL_depth_texture');
+    }
     gl.enable(gl.DEPTH_TEST);
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
     gl.clearColor(0.729, 0.764, 0.674, 1);
 
     camera = new Camera(canvas, gl);
     light = new Light(light);
-    light.translate([5.0, 10.0, 5.0], true);
+    light.translate([2.0, 3.0, 2.0], true);
     scene = new Scene();
     scene.setCamera(camera);
     scene.setLight(light);
@@ -72,6 +79,7 @@ window.onload = async () => {
     });
 
     shaderPrograms.phongSpecular = new ShaderProgram(gl, shaders.vertexPhong, shaders.fragmentPhongSpecular, shaderInfo, camera);
+    shaderPrograms.shadow = new ShaderProgram(gl, shaders.vertexShadow, shaders.fragmentShadow, shaderInfo, camera);
     shaderPrograms.phongSpecular.enable();
     camera.init();
 

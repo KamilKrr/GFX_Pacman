@@ -2,8 +2,6 @@ class Scene {
   constructor() {
     this.camera = null;
     this.light = null;
-    this.shapes = [];
-    this.supportShapes = []; // Shapes used for visual support, cannot be selected
     this.then = 0;
     this.gl = null;
   }
@@ -48,17 +46,10 @@ class Scene {
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
+    this.camera.draw();
     this.light.draw(camera, this.gl);
 
-    this.shapes.forEach(shape => {
-      shape.draw(this.camera);
-    });
-
-    this.game.render(this.camera);
-
-    this.supportShapes.forEach(shape => {
-      shape.draw(this.camera);
-    });
+    this.game.render(this.camera, this.light, this.gl);
   }
   
 }

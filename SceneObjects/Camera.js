@@ -16,10 +16,12 @@ class Camera extends SceneObject {
 
     mat4.lookAt(this.modelMatrix, [0, 1, 2], [0, 0, 0], [0, 1, 0]);
 
+    this.shear();
+  }
+
+  draw() {
     let projectionMatrixLocation = this.gl.getUniformLocation(currentShaderProgram.program, shaderInfo.uniforms.projectionMatrix);
     this.gl.uniformMatrix4fv(projectionMatrixLocation, this.gl.FALSE, this.projectionMatrix);
-
-    this.shear();
   }
 
   shear() {
@@ -28,9 +30,6 @@ class Camera extends SceneObject {
     this.projectionMatrix[12] = -0.44;
     this.projectionMatrix[13] = -0.44;
     this.projectionMatrix[14] = -0.9;
-
-    let projectionMatrixLocation = this.gl.getUniformLocation(currentShaderProgram.program, shaderInfo.uniforms.projectionMatrix);
-    this.gl.uniformMatrix4fv(projectionMatrixLocation, this.gl.FALSE, this.projectionMatrix);
   }
 
   unshear() {
@@ -39,8 +38,5 @@ class Camera extends SceneObject {
     this.projectionMatrix[12] = 0;
     this.projectionMatrix[13] = 0;
     this.projectionMatrix[14] = 0;
-
-    let projectionMatrixLocation = this.gl.getUniformLocation(currentShaderProgram.program, shaderInfo.uniforms.projectionMatrix);
-    this.gl.uniformMatrix4fv(projectionMatrixLocation, this.gl.FALSE, this.projectionMatrix);
   }
 }

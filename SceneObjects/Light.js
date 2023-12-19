@@ -4,12 +4,12 @@ class Light extends SceneObject {
   }
 
   draw(camera, gl) {
-    const lightViewMatrix = mat4.create();
-    mat4.mul(lightViewMatrix, this.modelMatrix, camera.modelMatrix);
+    const lightPosition = vec4.fromValues(3, 4, 3, 1);
 
-    const lightPosition = vec4.create();
-    vec4.set(lightPosition, lightViewMatrix[12], lightViewMatrix[13], lightViewMatrix[14], 1.0);
+    //vec4.transformMat4(lightPosition, lightPosition, this.modelMatrix);
+    vec4.transformMat4(lightPosition, lightPosition, camera.modelMatrix);
 
     gl.uniform4fv(currentShaderProgram.uniforms.lightPosition, lightPosition);
   }
+
 }

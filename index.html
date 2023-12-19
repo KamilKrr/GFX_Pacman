@@ -93,6 +93,39 @@
                        Ks * specular * specularColor, 1.0);
         }
     </script>
+
+    <script id="v-shadow" type="x-shader/x-vertex">
+        attribute vec4 vertexPosition;
+
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
+        uniform mat3 normalMatrix;
+        uniform vec4 lightViewPosition;
+
+        varying vec4 fragmentColor;
+
+        void main() {
+            mat4 shadowProjection = mat4(
+                lightViewPosition.y, 0.0, 0.0, 0.0,
+                -lightViewPosition.x, 0.0, -lightViewPosition.z, lightViewPosition.y,
+                0.0, 0.0, lightViewPosition.y, 0.0,
+                0.0, 0.0, 0.0, lightViewPosition.y
+            );
+
+            gl_Position = projectionMatrix * shadowProjection * modelViewMatrix * vertexPosition;
+            fragmentColor = vec4(0.1, 0.1, 0.1, 1.0);
+        }
+    </script>
+
+    <script id="f-shadow" type="x-shader/x-fragment">
+        precision mediump float;
+
+        varying vec4 fragmentColor;
+
+        void main() {
+            gl_FragColor = fragmentColor;
+        }
+    </script>
 </head>
 
 <body>

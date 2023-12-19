@@ -26,7 +26,7 @@ class Pacman {
   }
 
   update(delta, gameMap, camera, addScore, enablePowerMode, winGame) {
-    if(this.verticalPosition <= 0.05) {
+    if(this.verticalPosition <= 0.02) {
       if(this.wasInAir) {
         this.isJumping = false;
         this.isDoubleJump = false;

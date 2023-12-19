@@ -193,16 +193,27 @@ class Game {
     this.#showPopup("You Win");
   }
 
-  render(camera) {
+  render(camera, light, gl) {
     this.map.draw(camera);
 
     this.pacman.head.draw(camera);
     this.pacman.body.draw(camera);
 
+
+    //shaderPrograms.shadow.enable();
     this.ghosts.forEach(g => {
       g.body.draw(camera);
       g.eyes.draw(camera);
     })
+
+    //gl.clear(gl.DEPTH_BUFFER_BIT);
+    shaderPrograms.shadow.enable();
+    camera.draw();
+    light.draw(camera, gl);
+    this.pacman.head.draw(camera);
+    this.pacman.body.draw(camera);
+
+    shaderPrograms.phongSpecular.enable();
   }
 
 }

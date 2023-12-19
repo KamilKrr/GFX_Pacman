@@ -8,7 +8,7 @@
     labyrinth: fully implemented; it is automatically generated for each game
     animated Pacman: fully implemented; the pacman rotation and mouth are animated
     shear-view: fully implemented
-    shadow: not implemented
+    shadow: partly implemented, I tried but I failed; pacman has a shadow
 
     Continuous movement: fully implemented, just like in the real pacman game
     camera centers: fully implemented
